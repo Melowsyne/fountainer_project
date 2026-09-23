@@ -1,0 +1,34 @@
+{
+  "_comment": "Prototype FNT-000003 / esp32-94a990ddc1a8 (HW2.0, serial 00464E5400000003). Check the DHCP IP! NEVER PROD_PUMP_IP (production pump).",
+  "device": {
+    "host": "DEVICE_IP",
+    "port": 4443,
+    "path": "/ws",
+    "websocket_subprotocol": "fountain"
+  },
+  "tls": {
+    "ca_file": "/certs/root/certs/ca.crt.pem",
+    "client_cert_file": "/certs/clients/service-laptop-01.crt",
+    "client_key_file": "/certs/clients/service-laptop-01.key",
+    "verify_peer": true,
+    "use_mtls": true,
+    "verify_hostname": false
+  },
+  "connection": {
+    "auto_reconnect": true,
+    "connect_timeout_s": 10,
+    "reconnect_initial_s": 1,
+    "reconnect_max_s": 30
+  },
+  "logging": {
+    "level": "info"
+  },
+  "fountain": {
+    "device_id": "esp32-94a990ddc1a8",
+    "serial": "00464E5400000003",
+    "kid": "1",
+    "hmac_key_file": "/secrets/FNT-000003/hmac.key",
+    "handshake_timeout_s": 15,
+    "dp_read_on_ready": false
+  }
+}

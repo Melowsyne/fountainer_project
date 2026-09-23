@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+# Build (C++ builds run in the Docker volume, CAN program on the Pi)
+build/
+samples/canopen_cpp/canopen_sdo
+samples/canopen_cpp/od_cache.txt
+# never secrets/certificates
+*.key
+*.pem
+*.hmac
+# Stress-test raw data (JSONL, logs) — only the report is versioned
+stresstest/results/*/
