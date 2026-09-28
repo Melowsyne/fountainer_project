@@ -22,6 +22,7 @@ fountainer_project/
                             build_docker.sh, run_docker.sh       (C++ on the client framework, local WSS server)
     canopen_cpp/            canopen_sdo.cpp                      (C++ CANopen master with raw SocketCAN)
   doku/                     CAN_Signals.md + img/: oscilloscope captures of the CAN frames, decoded bit by bit
+  resources/                photos and renders of the hardware (figures in this README)
   stresstest/
     PLAN.md                 test plan
     run_stress.sh           orchestration of all phases
@@ -36,6 +37,45 @@ on SERVER_IP (`fountain_server`, Docker); CAN master Raspberry Pi 3B
 `PI_HOST` (PI_IP, MCP2515 HAT, `can0` 250 kbit/s). The
 production pump `esp32-a1b2c3d4e5f6` (PROD_PUMP_IP) is not addressed by any
 tool of this project.
+
+---
+
+## From Design to Prototype
+
+The device under test is the **Fountainer 24V** control board (v1.0 Rev 1,
+`../fountainer_hw_24v`): a six-layer PCB around an ESP32-S3-WROOM-1U that
+runs entirely on 24 V DC (SELV) and drives the pump through an external SSR.
+It was designed in KiCad, manufactured externally and assembled in-house by
+reflow soldering.
+
+![KiCad layout](resources/planing0.png)
+
+*Figure 1: KiCad layout of the six-layer board. Outline, mounting tabs and
+cut-outs follow the Phoenix Contact BC 71,6 DIN-rail enclosure; 24
+gold-plated test points and a bare JTAG pad field are provided for a
+bed-of-nails test fixture.*
+
+![KiCad 3D view](resources/planing1.png)
+
+*Figure 2: 3D view of the same design: ESP32-S3 module (U1) with u.FL antenna
+socket, 24 V and SSR terminals, 0-5 V pressure-sensor input, CAN terminal
+with 120 R termination switch, USB-C for programming and diagnostics.*
+
+![Bare boards](resources/boards_ordered.jpg)
+
+*Figure 3: The bare PCBs as delivered by the board house, front and back.*
+
+![Before reflow](resources/before_reflow.jpg)
+
+*Figure 4: Back side with solder paste and components placed, on the tray of
+the in-house reflow oven before soldering over the defined temperature
+profile.*
+
+![After reflow](resources/after_reflow.jpg)
+
+*Figure 5: Front side after reflow soldering: ESP32-S3 module, voltage
+converters, CAN section and terminals. This board became prototype
+FNT-000003 used in all measurements below.*
 
 ---
 
@@ -383,6 +423,14 @@ look like on the bus (heartbeat, TPDO1/3, SDO request/response decoded bit by
 bit, CAN_H/CAN_L levels, 4 µs bits): [`doku/CAN_Signals.md`](doku/CAN_Signals.md)
 with oscilloscope captures from 2026-09-23.
 
+![SDO request on the bus](resources/osci_messure.png)
+
+*Figure 6: Oscilloscope capture of an SDO upload request from the master to
+node 3 (object 0x200B): CAN_H/CAN_L levels against GND, the differential
+signal and the bit-by-bit decoding of the frame at 4 us bit time
+(250 kbit/s). Tektronix MSO2002B, prototype with TJA1051 transceiver,
+Raspberry Pi with MCP2515/MCP2562 as master.*
+
 ---
 
 ## 5. Stress Test: All Paths Simultaneously, Output Remains Controllable
@@ -428,6 +476,13 @@ on 4.40.1 after the fix), details and raw data in
 - `Fon_Pressure_Manual`/`Fon_Pressure_Value` are volatile: after a reboot the real sensor is active again; without a sensor (prototype on the test bench) fault 1 latches and `Fon_Fault_Ack` only takes effect with a healthy (or simulated) sensor.
 - Min-on/min-off time (default 30 s) applies on all paths: a `set_state Off` within the min-on time is accepted and recorded as a deadline (the relay drops out once it expires); an `On` within the min-off time, in the fault state or above `Fon_Max_Pressure` is rejected with `not_permitted`.
 - The CIFS share loses exec bits: start scripts with `bash script.sh`; C++ builds in the Docker volume.
+
+![Test run](resources/09_Testrun.jpg)
+
+*Figure 7: Test run on the bench: the prototype is powered with 24 V, the SSR
+output drives a test LED, the CAN terminal is wired to the Raspberry Pi
+master with oscilloscope probes on CAN_H/CAN_L, and USB-C provides flashing
+and the serial console.*
 
 ## License
 
